@@ -14,6 +14,7 @@ type todo = {
   name: string,
 };
 let todos = [
+  {finished: true, name: "State debug"},
   {finished: false, name: "State"},
   {finished: false, name: "Playable"},
   {finished: false, name: "Local multiplayer"},
@@ -33,7 +34,7 @@ let make = () => {
         {todos
          |> List.map(todo =>
               <li key={todo.name}>
-                {{todo.finished ? {js|✅|js} : {js|⟥|js}} |> React.string}
+                {{todo.finished ? {js|✅|js} : {js|☐|js}} |> React.string}
                 {todo.name |> React.string}
               </li>
             )
