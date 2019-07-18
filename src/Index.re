@@ -1,1 +1,1 @@
-ReactDOMRe.renderToElementWithId(<Component2 greeting="Hello!" />, "index");
+ReactDOMRe.renderToElementWithId(<App />, "index");
