@@ -1,5 +1,5 @@
-type state = {
-  board: BoardState.state,
-  something: int,
+type state = {gameState: GameState.state};
+let reducer = (state, action) => {
+  gameState: GameState.reducer(state.gameState, action),
 };
-let make = () => {board: BoardState.make(), something: 1337};
+let make = () => {gameState: GameState.make()};

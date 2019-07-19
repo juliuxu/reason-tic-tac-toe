@@ -1,28 +1,40 @@
 let borderStyle = "2px solid black";
-let itemDimension = "96px";
+let squareDimension = "96px";
 
-let styles =
-  ReactDOMRe.Style.make(
-    ~display="flex",
-    ~flexWrap="wrap",
-    ~border=borderStyle,
-    ~width="calc(96px * 3 + 4px)",
-    (),
-  );
+type styles = {
+  root: ReactDOMRe.Style.t,
+  square: ReactDOMRe.Style.t,
+  squareX: ReactDOMRe.Style.t,
+  squareO: ReactDOMRe.Style.t,
+  squareRight: ReactDOMRe.Style.t,
+  squareTop: ReactDOMRe.Style.t,
+};
 
-let stylesItem =
-  ReactDOMRe.Style.make(
-    ~height=itemDimension,
-    ~width=itemDimension,
-    ~display="flex",
-    ~alignItems="center",
-    ~justifyContent="center",
-    ~cursor="pointer",
-    (),
-  );
-let stylesItemRight = ReactDOMRe.Style.make(~borderRight=borderStyle, ());
-let stylesItemTop = ReactDOMRe.Style.make(~borderTop=borderStyle, ());
+let styles = {
+  root:
+    ReactDOMRe.Style.make(
+      ~display="flex",
+      ~flexWrap="wrap",
+      ~border=borderStyle,
+      ~width="calc(96px * 3 + 4px)",
+      (),
+    ),
+  square:
+    ReactDOMRe.Style.make(
+      ~height=squareDimension,
+      ~width=squareDimension,
+      ~display="flex",
+      ~alignItems="center",
+      ~justifyContent="center",
+      ~cursor="pointer",
+      (),
+    ),
 
+  squareX: ReactDOMRe.Style.make(~color="#791E94", ~fontSize="40px", ()),
+  squareO: ReactDOMRe.Style.make(~color="#DE6449", ~fontSize="48px", ()),
+  squareRight: ReactDOMRe.Style.make(~borderRight=borderStyle, ()),
+  squareTop: ReactDOMRe.Style.make(~borderTop=borderStyle, ()),
+};
 type border =
   | Top
   | Right;
@@ -43,8 +55,8 @@ let calculateBorder = id =>
 
 let rec bordersToStyle = borders =>
   switch (borders) {
-  | [Right] => stylesItemRight
-  | [Top] => stylesItemTop
+  | [Right] => styles.squareRight
+  | [Top] => styles.squareTop
   | [first, second] =>
     ReactDOMRe.Style.combine(
       bordersToStyle([first]),
@@ -53,18 +65,50 @@ let rec bordersToStyle = borders =>
   | _ => ReactDOMRe.Style.make()
   };
 
-let getItemStyle = id => id->calculateBorder->bordersToStyle;
+let getSquareStyle = id => id->calculateBorder->bordersToStyle;
+let getPlayerStyle = player => {
+  switch (player) {
+  | Some(GameState.X) => styles.squareX
+  | Some(GameState.O) => styles.squareO
+  | None => ReactDOMRe.Style.make()
+  };
+};
 
 [@react.component]
 let make = () => {
-  <div style=styles>
-    {[1, 2, 3, 4, 5, 6, 7, 8, 9]
-     |> List.map(x =>
+  let globalState = React.useContext(GlobalStateProvider.stateContext);
+  let dispatch = React.useContext(GlobalStateProvider.dispatchContext);
+  let board = globalState.gameState.board;
+
+  let onSquareClick = (index, _) => {
+    switch (List.nth(board, index)) {
+    | None => dispatch(GameState.Move(index))
+    | Some(_) => ()
+    };
+  };
+
+  <div style={styles.root}>
+    {board
+     |> List.mapi((index, x) =>
           <div
-            key={string_of_int(x)}
-            style={ReactDOMRe.Style.combine(stylesItem, getItemStyle(x))}>
-            {string_of_int(x) |> React.string}
-          </div>
+            onClick={onSquareClick(index)}
+            key={string_of_int(index)}
+            style={ReactDOMRe.Style.combine(
+              styles.square,
+              getSquareStyle(index + 1),
+            )}>
+            // {string_of_int(index) |> React.string}
+
+              <span style={getPlayerStyle(x)}>
+                {(
+                   switch (x) {
+                   | Some(player) => GameState.playerToString(player)
+                   | None => ""
+                   }
+                 )
+                 |> React.string}
+              </span>
+            </div>
         )
      |> Array.of_list
      |> React.array}

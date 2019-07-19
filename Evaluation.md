@@ -8,3 +8,6 @@
 * Have to remember to add () to end of labeled functions, like ReactDOMRe.Style.make
 * Bit hard to log out records
   - https://bucklescript.github.io/docs/en/better-data-structures-printing-debug-mode
+* Not that helpful error messages
+  - ReactDOMRe.Style.make(~color="blue") is wrong
+  - ReactDOMRe.Style.make(~color="blue", ()) is correct
