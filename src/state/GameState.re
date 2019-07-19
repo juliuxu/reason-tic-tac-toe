@@ -4,8 +4,10 @@ type player =
 
 let playerToString = player =>
   switch (player) {
-  | X => {j|╳|j}
-  | O => {j|◯|j}
+  // | X => {j|╳|j}
+  // | O => {j|◯|j}
+  | X => {j|X|j}
+  | O => {j|O|j}
   };
 
 type status =

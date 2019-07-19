@@ -16,7 +16,7 @@ let styles = {
       ~display="flex",
       ~flexWrap="wrap",
       ~border=borderStyle,
-      ~width="calc(96px * 3 + 4px)",
+      ~width={j|calc($squareDimension * 3 + 4px)|j},
       (),
     ),
   square:
@@ -31,7 +31,7 @@ let styles = {
     ),
 
   squareX: ReactDOMRe.Style.make(~color="#791E94", ~fontSize="40px", ()),
-  squareO: ReactDOMRe.Style.make(~color="#DE6449", ~fontSize="48px", ()),
+  squareO: ReactDOMRe.Style.make(~color="#DE6449", ~fontSize="40px", ()),
   squareRight: ReactDOMRe.Style.make(~borderRight=borderStyle, ()),
   squareTop: ReactDOMRe.Style.make(~borderTop=borderStyle, ()),
 };
@@ -80,7 +80,7 @@ let make = () => {
   let dispatch = React.useContext(GlobalStateProvider.dispatchContext);
   let board = globalState.gameState.board;
 
-  let onSquareClick = (index, _) => {
+  let onSquareClick = (index, e) => {
     switch (List.nth(board, index)) {
     | None => dispatch(GameState.Move(index))
     | Some(_) => ()
