@@ -81,24 +81,11 @@ let make = () => {
   let board = globalState.gameState.board;
 
   let onSquareClick = (index, _e) => {
-    switch (List.nth(board, index)) {
-    | None => dispatch(GameState.Move(index))
-    | Some(_) => ()
+    switch (List.nth(board, index), globalState.gameState.status) {
+    | (None, Unfinished(_)) => dispatch(GameState.Move(index))
+    | (_, _) => ()
     };
   };
-
-  React.useEffect1(
-    () => {
-      Notification.addMessage(
-        ~message={
-          "Rerender" |> React.string;
-        },
-        (),
-      );
-      None;
-    },
-    [|globalState.gameState.status|],
-  );
 
   <div style={styles.root}>
     {board

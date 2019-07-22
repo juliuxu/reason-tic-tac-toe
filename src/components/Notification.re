@@ -53,5 +53,6 @@ module Provider = {
   };
 };
 
-let addMessage = (~message, ~timeout=2000, ()) =>
+let addMessage = (~message, ~timeout=2000, ()) => {
   eventEmitter#call({message, timeout});
+};
