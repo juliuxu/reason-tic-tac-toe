@@ -80,12 +80,25 @@ let make = () => {
   let dispatch = React.useContext(GlobalStateProvider.dispatchContext);
   let board = globalState.gameState.board;
 
-  let onSquareClick = (index, e) => {
+  let onSquareClick = (index, _e) => {
     switch (List.nth(board, index)) {
     | None => dispatch(GameState.Move(index))
     | Some(_) => ()
     };
   };
+
+  React.useEffect1(
+    () => {
+      Notification.addMessage(
+        ~message={
+          "Rerender" |> React.string;
+        },
+        (),
+      );
+      None;
+    },
+    [|globalState.gameState.status|],
+  );
 
   <div style={styles.root}>
     {board

@@ -1,8 +1,6 @@
 let styles =
   ReactDOMRe.Style.make(
     ~font="14px \"Century Gothic\", Futura, sans-serif",
-    ~backgroundColor="#EEEEEE",
-    ~height="100vh",
     ~display="flex",
     ~flexDirection="column",
     ~alignItems="center",
@@ -27,51 +25,52 @@ let todos = [
 let make = () => {
   <GlobalStateProvider>
     <div style=styles>
-
-        <h1> {"Tic Tac Toe" |> React.string} </h1>
-        <h2>
-          <GlobalStateProvider.Consumer>
-            ...{state =>
-              (
-                switch (state.gameState.status) {
-                | GameState.Unfinished =>
-                  GameState.playerToString(state.gameState.currentPlayer)
-                  ++ " to move"
-                | GameState.Tie => "It's a tie"
-                | GameState.Win(player) =>
-                  {j|🎉|j}
-                  ++ GameState.playerToString(player)
-                  ++ {j| Wins 👏|j}
-                }
-              )
-              |> React.string
-            }
-          </GlobalStateProvider.Consumer>
-        </h2>
-        <Board />
-        <GlobalStateProvider.DispatchConsumer>
-          ...{dispatch =>
-            <div style={ReactDOMRe.Style.make(~marginTop="16px", ())}>
-              <button onClick={_ => dispatch(GameState.Clear)}>
-                {{j|👉New Game|j} |> React.string}
-              </button>
-            </div>
+      <h1> {"Tic Tac Toe" |> React.string} </h1>
+      // Status
+      <h2>
+        <GlobalStateProvider.Consumer>
+          ...{state =>
+            (
+              switch (state.gameState.status) {
+              | GameState.Unfinished(player) =>
+                GameState.playerToString(player) ++ " to move"
+              | GameState.Tie => "It's a tie"
+              | GameState.Win(player) =>
+                {j|🎉|j}
+                ++ GameState.playerToString(player)
+                ++ {j| Wins 👏|j}
+              }
+            )
+            |> React.string
           }
-        </GlobalStateProvider.DispatchConsumer>
-      </div>
-      // <h3> {"Debug" |> React.string} </h3>
-      // <GlobalStateView />
-      // <h3> {"Todos" |> React.string} </h3>
-      // <ul style={ReactDOMRe.Style.make(~margin="", ())}>
-      //   {todos
-      //    |> List.map(todo =>
-      //         <li key={todo.name}>
-      //           {{todo.finished ? {js|✅|js} : {js|☐|js}} |> React.string}
-      //           {todo.name |> React.string}
-      //         </li>
-      //       )
-      //    |> Array.of_list
-      //    |> React.array}
-      // </ul>
+        </GlobalStateProvider.Consumer>
+      </h2>
+      <Board />
+      <Notification.Provider />
+      // Actions
+      <GlobalStateProvider.DispatchConsumer>
+        ...{dispatch =>
+          <div style={ReactDOMRe.Style.make(~marginTop="16px", ())}>
+            <button onClick={_ => dispatch(GameState.Clear)}>
+              {{j|👉New Game|j} |> React.string}
+            </button>
+          </div>
+        }
+      </GlobalStateProvider.DispatchConsumer>
+      <h3> {"Debug" |> React.string} </h3>
+      <GlobalStateView />
+      <h3> {"Todos" |> React.string} </h3>
+      <ul style={ReactDOMRe.Style.make(~margin="", ())}>
+        {todos
+         |> List.map(todo =>
+              <li key={todo.name}>
+                {{todo.finished ? {js|✅|js} : {js|☐|js}} |> React.string}
+                {todo.name |> React.string}
+              </li>
+            )
+         |> Array.of_list
+         |> React.array}
+      </ul>
+    </div>
   </GlobalStateProvider>;
 };

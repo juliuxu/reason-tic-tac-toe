@@ -11,14 +11,13 @@ let playerToString = player =>
   };
 
 type status =
-  | Unfinished
+  | Unfinished(player)
   | Win(player)
   | Tie;
 
 type square = option(player);
 
 type state = {
-  currentPlayer: player,
   board: list(square),
   status,
 };
@@ -29,8 +28,8 @@ type action =
 
 let makeBoard = () => [None, None, None, None, None, None, None, None, None];
 
-let checkStatus = (board: list(square)): status =>
-  switch (board) {
+let updateStatus = (state): status =>
+  switch (state.board) {
   | [Some(X), Some(X), Some(X), _, _, _, _, _, _] => Win(X)
   | [_, _, _, Some(X), Some(X), Some(X), _, _, _] => Win(X)
   | [_, _, _, _, _, _, Some(X), Some(X), Some(X)] => Win(X)
@@ -62,27 +61,22 @@ let checkStatus = (board: list(square)): status =>
     ] =>
     Tie
 
-  | _ => Unfinished
+  | _ when state.status == Unfinished(X) => Unfinished(O)
+  | _ when state.status == Unfinished(O) => Unfinished(X)
+  | _ => Unfinished(X)
   };
 
-let make = (): state => {
-  currentPlayer: X,
-  status: Unfinished,
-  board: makeBoard(),
-};
+let make = (): state => {status: Unfinished(X), board: makeBoard()};
 
 let reducer = (state, action) =>
-  switch (action) {
-  | Move(position) when state.status === Unfinished =>
+  switch (action, state.status) {
+  | (Move(position), Unfinished(player)) =>
     let board =
       state.board
-      |> List.mapi((index, x) =>
-           index === position ? Some(state.currentPlayer) : x
-         );
-    let status = checkStatus(board);
-    let currentPlayer = state.currentPlayer === X ? O : X;
-    {currentPlayer, status, board};
-  | Move(_) => state
+      |> List.mapi((index, x) => index === position ? Some(player) : x);
+    let status = updateStatus({...state, board});
+    {status, board};
 
-  | Clear => make()
+  | (Move(_), _) => state
+  | (Clear, _) => make()
   };
